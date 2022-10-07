@@ -15,6 +15,9 @@ local blankline = spacechar^0 * newline
 local endline = newline * #-blankline
 local endequals = spacechar^0 * P"="^0 * spacechar^0 * newline
 local cellsep = spacechar^0 * P"|"
+local upper = R"AZ"
+local lower = R"az"
+local alpha = R("AZ", "az")
 
 local function trim(s)
    return (s:gsub("^%s*(.-)%s*$", "%1"))
@@ -168,7 +171,7 @@ local G = P{ "Doc",
        * C((1 - P"}}}")^0)
        * P"}}}"
        / trim / pandoc.Code ;
-  Link = C(R"AZ"^1 * R"az"^1 * R"AZ"^1 * R("AZ", "az")^1)
+  Link = C(upper^1 * lower^1 * upper^1 * alpha^1)
        / function(txt)
            return pandoc.Link(txt, txt)
          end ;
