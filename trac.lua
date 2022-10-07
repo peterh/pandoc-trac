@@ -38,7 +38,7 @@ local function ListItem(lev, start)
   local parser = spacechar^(lev*2+1)
                * start
                * spacechar^1
-               * Ct((V"Inline" - liststart)^0)
+               * Ct((V"Inline" - liststart - newline)^0)
                * newline
                * (Ct(subitem(P"*")^1) / pandoc.BulletList
                   +
@@ -62,7 +62,7 @@ local G = P{ "Doc",
           + V"List"
           + V"Table"
           + V"Para") ;
-  Para = Ct((V"Inline" - liststart - tablestart)^1)
+  Para = Ct((V"Inline" - liststart - tablestart - blankline)^1)
        * newline
        / pandoc.Para ;
   HorizontalRule = spacechar^0
