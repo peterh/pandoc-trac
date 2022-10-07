@@ -130,6 +130,7 @@ local G = P{ "Doc",
          + V"Superscript"
          + V"Subscript"
          + V"LineBreak"
+         + V"Macro"
          + V"Link"
          + V"URL"
          + V"Image"
@@ -154,6 +155,13 @@ local G = P{ "Doc",
             / pandoc.SoftBreak ;
   LineBreak = P"\\\\"
             / pandoc.LineBreak ;
+  Macro = P"[[" * C(wordchar^1) * P"]]"
+            / function(txt)
+                if string.lower(txt) == "br" then
+                  return pandoc.LineBreak()
+                end
+                return pandoc.Str("")
+              end ;
   Code = P"{{{"
        * C((1 - P"}}}")^0)
        * P"}}}"
