@@ -1,5 +1,5 @@
--- A sample custom reader for Creole 1.0 (common wiki markup)
--- http://www.wikicreole.org/wiki/CheatSheet
+-- A sample custom reader for Trac (wiki markup)
+-- https://trac.edgewall.org/wiki/WikiFormatting
 
 -- For better performance we put these functions in local variables:
 local P, S, R, Cf, Cc, Ct, V, Cs, Cg, Cb, B, C, Cmt =
