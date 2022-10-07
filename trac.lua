@@ -52,7 +52,7 @@ local function ListItem(lev, ch)
 end
 
 -- Grammar
-G = P{ "Doc",
+local G = P{ "Doc",
   Doc = Ct(V"Block"^0)
       / pandoc.Pandoc ;
   Block = blankline^0
