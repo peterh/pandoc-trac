@@ -132,7 +132,9 @@ local G = P{ "Doc",
          + V"LineBreak"
          + V"Macro"
          + V"Link"
+         + V"Link2"
          + V"URL"
+         + V"URLLink"
          + V"Image"
          + V"Str"
          + V"Space"
@@ -166,9 +168,14 @@ local G = P{ "Doc",
        * C((1 - P"}}}")^0)
        * P"}}}"
        / trim / pandoc.Code ;
-  Link = P"[["
-       * C((1 - (P"]]" + P"|"))^0)
-       * (P"|" * Ct((V"Inline" - P"]]")^1))^-1 * P"]]"
+  Link = C(R"AZ"^1 * R"az"^1 * R"AZ"^1 * R("AZ", "az")^1)
+       / function(txt)
+           return pandoc.Link(txt, txt)
+         end ;
+  Link2 = P"[wiki:"
+       * C(wordchar^1)
+       * (spacechar * C((wordchar+spacechar)^1))^0
+       * P"]"
        / function(url, desc)
            local txt = desc or {pandoc.Str(url)}
            return pandoc.Link(txt, url)
@@ -187,7 +194,21 @@ local G = P{ "Doc",
       * P":"
       * (1 - (whitespacechar + (S",.?!:;\"'" * #whitespacechar)))^1
       / function(url)
+          if string.find(url, ".gif", -4) or string.find(url, ".png", -4) or string.find(url, ".jpg", -4) then
+            return pandoc.Image(pandoc.Str(url), url)
+          end
           return pandoc.Link(pandoc.Str(url), url)
+        end ;
+  URLLink = P"["
+      * C("http"
+      * P"s"^-1
+      * P":"
+      * (1 - whitespacechar)^1)
+      * whitespacechar
+      * C((1 - P"]")^1)
+      * P"]"
+      / function(url, desc)
+          return pandoc.Link(desc, url)
         end ;
   Emph = P"//"
        * Ct((V"Inline" - P"//")^1)
