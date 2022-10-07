@@ -18,18 +18,15 @@ local cellsep = spacechar^0 * P"|"
 local upper = R"AZ"
 local lower = R"az"
 local alpha = R("AZ", "az")
+local digit = R"09"
+local listtok = P"*" + digit^1 * P"."
+local liststart = newline * spacechar^0 * listtok
 
 local function trim(s)
    return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
-local function ListItem(lev, ch)
-  local start
-  if ch == nil then
-    start = S"*#"
-  else
-    start = P(ch)
-  end
+local function ListItem(lev, start)
   local subitem = function(c)
     if lev < 6 then
       return ListItem(lev + 1, c)
@@ -37,15 +34,14 @@ local function ListItem(lev, ch)
       return (1 - 1) -- fails
     end
   end
-  local parser = spacechar^0
-               * start^lev
-               * #(- start)
-               * spacechar^0
-               * Ct((V"Inline" - (newline * spacechar^0 * S"*#"))^0)
+  local parser = spacechar^(lev*2+1)
+               * start
+               * spacechar^1
+               * Ct((V"Inline" - liststart)^0)
                * newline
-               * (Ct(subitem("*")^1) / pandoc.BulletList
+               * (Ct(subitem(P"*")^1) / pandoc.BulletList
                   +
-                  Ct(subitem("#")^1) / pandoc.OrderedList
+                  Ct(subitem(digit^1 * P".")^1) / pandoc.OrderedList
                   +
                   Cc(nil))
                / function (ils, sublist)
@@ -65,7 +61,7 @@ local G = P{ "Doc",
           + V"List"
           + V"Table"
           + V"Para") ;
-  Para = Ct(V"Inline"^1)
+  Para = Ct((V"Inline" - liststart)^1)
        * newline
        / pandoc.Para ;
   HorizontalRule = spacechar^0
@@ -90,9 +86,9 @@ local G = P{ "Doc",
               / function() return pandoc.Div({}) end;
   List = V"BulletList"
        + V"OrderedList" ;
-  BulletList = Ct(ListItem(1,'*')^1)
+  BulletList = Ct(ListItem(0, P"*")^1)
              / pandoc.BulletList ;
-  OrderedList = Ct(ListItem(1,'#')^1)
+  OrderedList = Ct(ListItem(0, digit^1 * P".")^1)
              / pandoc.OrderedList ;
   Table = (V"TableHeader" + Cc{})
         * Ct(V"TableRow"^1)
