@@ -7,7 +7,7 @@ local P, S, R, Cf, Cc, Ct, V, Cs, Cg, Cb, B, C, Cmt =
   lpeg.Cs, lpeg.Cg, lpeg.Cb, lpeg.B, lpeg.C, lpeg.Cmt
 
 local whitespacechar = S(" \t\r\n")
-local specialchar = S("/*~[]\\{}|")
+local specialchar = S("/*~[]\\{}|!")
 local wordchar = (1 - (whitespacechar + specialchar))
 local spacechar = S(" \t")
 local newline = P"\r"^-1 * P"\n"
@@ -136,7 +136,7 @@ local G = P{ "Doc",
          + V"Special" ;
   Str = wordchar^1
       / pandoc.Str;
-  Escaped = P"~"
+  Escaped = P"!"
           * C(P(1))
           / pandoc.Str ;
   Special = specialchar
