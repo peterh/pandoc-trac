@@ -62,7 +62,7 @@ local G = P{ "Doc",
           + V"List"
           + V"Table"
           + V"Para") ;
-  Para = Ct((V"Inline" - liststart - tablestart - blankline)^1)
+  Para = Ct((V"Inline" - liststart - tablestart - newline)^1)
        * newline
        / pandoc.Para ;
   HorizontalRule = spacechar^0
