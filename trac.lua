@@ -154,6 +154,11 @@ local G = P{ "Doc",
                 if string.lower(txt) == "br" then
                   return pandoc.LineBreak()
                 end
+                fn = string.match(txt, "Image%((%g+)%)")
+                if fn then
+                  local url = "attachments/wiki/" .. PANDOC_STATE.input_files[1] .. "/" .. fn
+                  return pandoc.Image(pandoc.Str(url), url)
+                end
                 return pandoc.Str("")
               end ;
   Code = P"{{{"
