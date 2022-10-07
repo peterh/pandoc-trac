@@ -192,8 +192,7 @@ local G = P{ "Doc",
           return pandoc.Link(pandoc.Str(url), url)
         end ;
   URLLink = P"["
-      * C("http"
-      * P"s"^-1
+      * C((P"http" * P"s"^-1 + P"mailto")
       * P":"
       * (1 - whitespacechar)^1)
       * whitespacechar
