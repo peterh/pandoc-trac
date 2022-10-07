@@ -211,14 +211,12 @@ local G = P{ "Doc",
          * P"**"
          / pandoc.Strong ;
   Strong2 = P"'''"
-         * Ct((V"Inline" -P"'''")^1)
+         * Ct((V"Inline" -P"'")^1)
          * P"'''"
          / pandoc.Strong ;
   Emph2 = P"''"
-       * #-P"'"
-       * Ct((V"Inline" - P"''")^1)
+       * Ct((V"Inline" - (P"''" * -P"'"))^1)
        * P"''"
-       * #-P"'"
        / pandoc.Emph ;
   Strike = P"~~"
          * Ct((V"Inline" -P"~~")^1)
