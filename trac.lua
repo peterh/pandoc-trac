@@ -14,7 +14,8 @@ local newline = P"\r"^-1 * P"\n"
 local blankline = spacechar^0 * newline
 local endline = newline * #-blankline
 local endequals = spacechar^0 * P"="^0 * spacechar^0 * newline
-local cellsep = spacechar^0 * P"|"
+local cellsep = spacechar^0 * P"||"
+local tablestart = newline * cellsep
 local upper = R"AZ"
 local lower = R"az"
 local alpha = R("AZ", "az")
@@ -61,7 +62,7 @@ local G = P{ "Doc",
           + V"List"
           + V"Table"
           + V"Para") ;
-  Para = Ct((V"Inline" - liststart)^1)
+  Para = Ct((V"Inline" - liststart - tablestart)^1)
        * newline
        / pandoc.Para ;
   HorizontalRule = spacechar^0
@@ -90,10 +91,10 @@ local G = P{ "Doc",
              / pandoc.BulletList ;
   OrderedList = Ct(ListItem(0, digit^1 * P".")^1)
              / pandoc.OrderedList ;
-  Table = (V"TableHeader" + Cc{})
-        * Ct(V"TableRow"^1)
-        / function(headrow, bodyrows)
+  Table = Ct(V"TableRow"^1)
+        / function(bodyrows)
             local numcolumns = #(bodyrows[1])
+            local headerrow = table.remove(bodyrows, 1)
             local aligns = {}
             local widths = {}
             for i = 1,numcolumns do
@@ -101,24 +102,16 @@ local G = P{ "Doc",
               widths[i] = 0
             end
             return pandoc.utils.from_simple_table(
-              pandoc.SimpleTable({}, aligns, widths, headrow, bodyrows))
+              pandoc.SimpleTable({}, aligns, widths, headerrow, bodyrows))
           end ;
-  TableHeader = Ct(V"HeaderCell"^1)
-              * cellsep^-1
-              * spacechar^0
-              * newline ;
   TableRow   = Ct(V"BodyCell"^1)
-             * cellsep^-1
+             * cellsep
              * spacechar^0
              * newline ;
-  HeaderCell = cellsep
-             * P"="
-             * spacechar^0
-             * Ct((V"Inline" - (newline + cellsep))^0)
-             / function(ils) return { pandoc.Plain(ils) } end ;
   BodyCell   = cellsep
              * spacechar^0
              * Ct((V"Inline" - (newline + cellsep))^0)
+             * #cellsep
              / function(ils) return { pandoc.Plain(ils) } end ;
   Inline = V"Emph"
          + V"Strong"
