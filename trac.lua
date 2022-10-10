@@ -7,7 +7,7 @@ local P, S, R, Cf, Cc, Ct, V, Cs, Cg, Cb, B, C, Cmt =
   lpeg.Cs, lpeg.Cg, lpeg.Cb, lpeg.B, lpeg.C, lpeg.Cmt
 
 local whitespacechar = S(" \t\r\n")
-local specialchar = S("/*~[]\\{}|!'")
+local specialchar = S("/*~[]\\{}|!'_")
 local wordchar = (1 - (whitespacechar + specialchar))
 local spacechar = S(" \t")
 local newline = P"\r"^-1 * P"\n"
