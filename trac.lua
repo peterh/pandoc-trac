@@ -151,8 +151,13 @@ local G = P{ "Doc",
             / pandoc.LineBreak ;
   Macro = P"[[" * C(wordchar^1) * P"]]"
             / function(txt)
-                if string.lower(txt) == "br" then
+                local lctxt = string.lower(txt)
+                if lctxt == "br" then
                   return pandoc.LineBreak()
+                end
+                if lctxt == "pageoutline" then
+                  -- Gitlab flavored markdown, even if github doesn't support this
+                  return pandoc.RawInline("gfm", "[[_TOC_]]")
                 end
                 fn = string.match(txt, "Image%((%g+)%)")
                 if fn then
