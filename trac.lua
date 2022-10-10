@@ -171,7 +171,7 @@ local G = P{ "Doc",
          end ;
   Link2 = P"[wiki:"
        * C(wordchar^1)
-       * (spacechar * C((wordchar+spacechar)^1))^0
+       * (spacechar * C((P(1) - P"]")^1))^0
        * P"]"
        / function(url, desc)
            local txt = desc or {pandoc.Str(url)}
